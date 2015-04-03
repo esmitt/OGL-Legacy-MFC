@@ -2,7 +2,6 @@
 #define __TEXTURE_H__
 
 #include <string>
-//#include "GL/freeglut.h"
 
 /**
 * Class Texture.
@@ -13,7 +12,6 @@ class CTexture
 {
 
 	//Functions
-
 	public:
 
 		///Default constructor

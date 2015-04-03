@@ -1,5 +1,6 @@
 #pragma once
 #include "glm\glm.hpp"
+/// Internal data structure used in ArcBall
 class CArcBallMatrix
 {
 private:

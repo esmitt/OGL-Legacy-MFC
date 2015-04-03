@@ -3,6 +3,7 @@
 #include "ArcBallMatrix.h"
 #include "OGLBasic.h"
 
+/// A class to manage the mouse and the object as control
 class CArcBall
 {
 private:
@@ -27,6 +28,5 @@ public:
 	const glm::mat4 & GetTransformation(){ return m_mThisTranf.GetMatrix(); }
 	void OnMouseDown(glm::ivec2 point);
 	void OnMouseMove(glm::ivec2 point, MOUSE_OP action);
-	void OnMouseUp(glm::ivec2 point);
 };
 

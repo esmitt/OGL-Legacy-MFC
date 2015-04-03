@@ -12,7 +12,7 @@ public:
 		// Instantiated on first use.
 		return instance;
 	}
-	const float fNCP = 0.01;
+	const float fNCP = 0.01f;
 	const float fFCP = 500.f;
 	const float fAngle = 45.f;
 private:

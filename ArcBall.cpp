@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ArcBall.h"
 
-
+/// Constructor
 CArcBall::CArcBall()
 {
 	m_fWidth = 1;
@@ -10,11 +10,12 @@ CArcBall::CArcBall()
 	m_iHeightCanvas = 1;
 }
 
-
+/// Destructor
 CArcBall::~CArcBall()
 {
 }
 
+/// When the window is resized
 void CArcBall::Resize(float NewWidth, float NewHeight)
 {
 	//Set adjustment factor for width/height
@@ -24,12 +25,14 @@ void CArcBall::Resize(float NewWidth, float NewHeight)
 	m_fHeight = 1.0f / ((NewHeight - 1.0f) * 0.5f);
 }
 
+/// Set the initial values
 void CArcBall::Reset()
 {
 	m_mLastTranf.Reset();
 	m_mThisTranf.Reset();
 }
 
+/// Map the click point into a 4D value
 glm::vec3 CArcBall::mapToSphere(glm::ivec2 point)
 {
 	glm::vec3 vector;
@@ -42,7 +45,6 @@ glm::vec3 CArcBall::mapToSphere(glm::ivec2 point)
 	//Compute square of the length of the vector from this point to the center
 	//float length = (tempPoint.x * tempPoint.x) + (tempPoint.y * tempPoint.y);
 	float length = glm::dot(tempPoint, tempPoint);
-	//tempPoint
 
 	//If the point is mapped outside the sphere... (length > radius squared)
 	if (length > 1.0f)
@@ -66,6 +68,7 @@ glm::vec3 CArcBall::mapToSphere(glm::ivec2 point)
 	return vector;
 }
 
+/// When the 2st click is made
 void CArcBall::OnMouseDown(glm::ivec2 point)
 {
 	m_mLastTranf = m_mThisTranf;
@@ -73,6 +76,7 @@ void CArcBall::OnMouseDown(glm::ivec2 point)
 	m_MouseStart = point;
 }
 
+/// When a continuous click point is performed using som button
 void CArcBall::OnMouseMove(glm::ivec2 point, MOUSE_OP action)
 {
 	m_vDragVector = mapToSphere(point);
@@ -99,8 +103,7 @@ void CArcBall::OnMouseMove(glm::ivec2 point, MOUSE_OP action)
 		m_mThisTranf.SetRotation(vNewRot2);
 		m_mThisTranf.SetMatrix(m_mThisTranf.GetMatrix() * m_mLastTranf.GetMatrix());
 	}
-	else
-		if (action == SCALE)
+	else if (action == SCALE)
 	{
 		double len = glm::sqrt(m_MouseStart.x * m_MouseStart.x + m_MouseStart.y * m_MouseStart.y)
 			/ glm::sqrt(point.x * point.x + point.y * point.y);
@@ -117,9 +120,4 @@ void CArcBall::OnMouseMove(glm::ivec2 point, MOUSE_OP action)
 		m_mThisTranf.SetRotation(vNewRot);
 		m_mThisTranf.SetMatrix(m_mThisTranf.GetMatrix() * m_mLastTranf.GetMatrix());
 	}
-}
-
-void CArcBall::OnMouseUp(glm::ivec2 point)
-{
-
 }

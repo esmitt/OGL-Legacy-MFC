@@ -46,10 +46,11 @@ END_MESSAGE_MAP()
 COpenGLView::COpenGLView()
 {
 	// TODO: add construction code here
-	bIsLeftMouse = false;
-	bIsCenterMouse = false;
-	bIsRightMouse = false;
+	m_bIsLeftMouse = false;
+	m_bIsCenterMouse = false;
+	m_bIsRightMouse = false;
 	m_bIsSelection = false;
+	m_bIsBoxCreated = false;
 }
 
 COpenGLView::~COpenGLView()
@@ -75,7 +76,25 @@ void COpenGLView::OnDraw(CDC* pDC)
 	// TODO: add draw code for native data here
 	//GetDocument()
 	pDoc->m_instanceOGL.DrawScene(pDC);
-	m_box.Draw();
+	if (m_bIsSelection)	//selection mode
+	{
+		if (m_bIsLeftMouse)
+		{
+			if (!m_bIsBoxCreated)
+				pDoc->m_instanceOGL.CreateBox(m_startPoint.x, m_startPoint.y, m_endPoint.x, m_endPoint.y);
+			else
+			{
+				pDoc->m_instanceOGL.MoveBoxXY(createdPoint.x, createdPoint.y);
+				pDoc->m_instanceOGL.SelectBox();
+			}
+		}
+		else
+			pDoc->m_instanceOGL.SelectBox();
+		pDoc->m_instanceOGL.DrawBox();	//this contains the Select and Draw
+	}
+	else
+		pDoc->m_instanceOGL.Clear();
+
 	SwapBuffers(pDC->m_hDC);
 }
 
@@ -168,13 +187,18 @@ void COpenGLView::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (nFlags == MK_LBUTTON)
 	{
+		m_bIsLeftMouse = true;
 		if (m_bIsSelection)
 		{
-			GetDocument()->UnProjection(CPoint(0, 0), 1, 1);
+			//m_startPoint = m_endPoint = point;
+			RECT rect;
+			GetClientRect(&rect);
+			m_startPoint.x = point.x;
+			m_startPoint.y = rect.bottom - point.y;
+			m_endPoint = m_startPoint;
 		}
 		else
 		{
-			bIsLeftMouse = true;
 			GetDocument()->m_instanceOGL.MouseDown(point.x, point.y);
 		}		
 	}
@@ -187,15 +211,25 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (m_bIsSelection)
 	{
-	
+
+		RECT rect;
+		GetClientRect(&rect);
+		m_endPoint.x = point.x;
+		m_endPoint.y = rect.bottom - point.y;
+		if (m_bIsBoxCreated)
+		{
+			createdPoint.x = point.x;
+			createdPoint.y = rect.bottom - point.y;
+		}
+		Invalidate(false);
 	}
 	else
 	{
-		if (bIsLeftMouse)
+		if (m_bIsLeftMouse)
 			GetDocument()->m_instanceOGL.MouseMove(point.x, point.y, ROTATE);
-		else if (bIsRightMouse)
+		else if (m_bIsRightMouse)
 			GetDocument()->m_instanceOGL.MouseMove(point.x, point.y, TRANSLATE);
-		else if (bIsCenterMouse)
+		else if (m_bIsCenterMouse)
 			GetDocument()->m_instanceOGL.MouseMove(point.x, point.y, SCALE);
 	}
 	
@@ -208,13 +242,13 @@ void COpenGLView::OnLButtonUp(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (m_bIsSelection)
 	{
-	
+		//add somthing about  m_endPoint
+		//if (nFlags == )
+		m_bIsBoxCreated = true;
 	}
-	else
-	{
-		if (bIsLeftMouse)
-			bIsLeftMouse = false;	//it could be an if/else statement but its the same
-	}
+
+	if (m_bIsLeftMouse)
+		m_bIsLeftMouse = false;	//it could be an if/else statement but its the same
 	CView::OnLButtonUp(nFlags, point);
 }
 
@@ -224,8 +258,13 @@ void COpenGLView::OnRButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (nFlags == MK_RBUTTON)
 	{
-		bIsRightMouse = true;
-		GetDocument()->m_instanceOGL.MouseDown(point.x, point.y);
+		m_bIsRightMouse = true;
+		if (m_bIsSelection)
+		{
+		
+		}
+		else
+			GetDocument()->m_instanceOGL.MouseDown(point.x, point.y);
 	}
 	CView::OnRButtonDown(nFlags, point);
 }
@@ -234,8 +273,8 @@ void COpenGLView::OnRButtonDown(UINT nFlags, CPoint point)
 void COpenGLView::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	if (bIsRightMouse)
-		bIsRightMouse = false;
+	if (m_bIsRightMouse)
+		m_bIsRightMouse = false;
 	CView::OnRButtonUp(nFlags, point);
 }
 
@@ -245,7 +284,7 @@ void COpenGLView::OnMButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (nFlags == MK_MBUTTON)
 	{
-		bIsCenterMouse = true;
+		m_bIsCenterMouse = true;
 		GetDocument()->m_instanceOGL.MouseDown(point.x, point.y);
 	}
 	CView::OnMButtonDown(nFlags, point);
@@ -255,8 +294,8 @@ void COpenGLView::OnMButtonDown(UINT nFlags, CPoint point)
 void COpenGLView::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: Add your message handler code here and/or call default
-	if (bIsCenterMouse)
-		bIsCenterMouse = false;
+	if (m_bIsCenterMouse)
+		m_bIsCenterMouse = false;
 	CView::OnMButtonUp(nFlags, point);
 }
 
@@ -265,7 +304,6 @@ void COpenGLView::OnButtonSelection()
 {
 	// TODO: Add your command handler code here
 	m_bIsSelection = !m_bIsSelection;
-	
 }
 
 
@@ -273,4 +311,5 @@ void COpenGLView::OnUpdateButtonSelection(CCmdUI *pCmdUI)
 {
 	// TODO: Add your command update UI handler code here
 	pCmdUI->SetCheck(m_bIsSelection);
+	Invalidate(false);
 }

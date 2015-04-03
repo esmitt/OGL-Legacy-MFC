@@ -2,7 +2,6 @@
 // OpenGLDoc.h : interface of the COpenGLDoc class
 //
 
-
 #pragma once
 #include "GLRenderer.h"
 class COpenGLDoc : public CDocument
@@ -11,13 +10,12 @@ protected: // create from serialization only
 	COpenGLDoc();
 	DECLARE_DYNCREATE(COpenGLDoc)
 public:
-	CGLRenderer m_instanceOGL;
+	CGLRenderer m_instanceOGL;	//important member variable
 // Attributes
 public:
 	CPoint m_windowSize;
 // Operations
 public:
-	void UnProjection(CPoint point, int width, int height);
 // Overrides
 public:
 	virtual BOOL OnNewDocument();

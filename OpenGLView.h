@@ -3,8 +3,8 @@
 //
 
 #pragma once
-#include "BoxSelection.h"
-
+//#include "BoxSelection.h"
+//#include "BBox.h"
 class COpenGLView : public CView
 {
 protected: // create from serialization only
@@ -34,12 +34,15 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 private:
-	CBoxSelection m_box;
+	bool m_bIsBoxCreated;
+	CPoint m_startPoint;		//to click the left button
+	CPoint m_endPoint;			//to dragging/finish the mouse clicking
 protected:
-	bool bIsLeftMouse;
-	bool bIsRightMouse;
-	bool bIsCenterMouse;
+	bool m_bIsLeftMouse;
+	bool m_bIsRightMouse;
+	bool m_bIsCenterMouse;
 	bool m_bIsSelection;
+	CPoint createdPoint;
 // Generated message map functions
 protected:
 	DECLARE_MESSAGE_MAP()

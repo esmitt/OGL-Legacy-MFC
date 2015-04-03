@@ -8,6 +8,7 @@ namespace
 	const int Z = 0;
 };
 
+//Class to manage the bounding box of the object 3D
 class CBoundingBox
 {
 private:

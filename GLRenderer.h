@@ -6,7 +6,9 @@
 #include <string>
 #include "ArcBall.h"
 #include "OGLBasic.h"
+#include "BBox.h"
 
+//The important class: Everything related to OpenGL to the View class..is here
 class CGLRenderer
 {
 public:
@@ -21,13 +23,25 @@ public:
 	void MouseMove(int x, int y, MOUSE_OP operation);
 	glm::mat4 GetModelViewMatrix(){ return m_modelViewMatrix; }
 	glm::mat4 GetProjectionMatrix(){ return m_projMatrix; }
+	//about the box selection
+	void CreateBox(int x0, int y0, int x1, int y1);
+	void MoveBoxXY(int x, int y);
+	void DrawBox();
+	void Clear();
+	void SelectBox();
+	void DrawIndicator();
 protected:
 	HGLRC	 m_hrc;                        // OpenGL Rendering Context 
 	CArcBall m_arcBall;
 	glm::vec3 m_vVertexColor;			//color of vertex drawn
 private:
+	std::vector<bool> m_vSelected;
 	C3DModel m_model;
-	glm::mat4x4 m_projMatrix, m_modelViewMatrix;
+	glm::mat4 m_projMatrix, m_modelViewMatrix;
 	void DrawGradientBackground();
+	void DrawNormalBackground();
+	int m_iWidth, m_iHeight;
+	glm::mat4 m_mViewMatrix;
+	CBBox m_box;
 };
 

@@ -111,33 +111,32 @@ void checkError(char *str)
 		TRACE("GL Error: %s (%s)\n", GLErrorString(error), str);
 }
 //obtain the 3D model points from selection of user
-void COpenGLDoc::UnProjection(CPoint point, int width, int height)
-{
-	GLint view[16];
-	glm::ivec2 start(point.x, point.y);
-	glm::ivec2 end(point.x + width, point.y + height);
-	glm::vec3 currentPoint(0);
-	glm::vec3 objcoord(0);
-	float* pDepth = new float[width*height];
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glReadPixels(start.x, start.y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, &pDepth);
-	checkError("Readpixel");
-	//glm::vec3 onTheScreen(point.x, point.y, 0.0f);
-	glm::vec4 viewport = glm::vec4(0.0f, 0.0f, m_windowSize.x, m_windowSize.y);
-	glm::mat4 modelview = m_instanceOGL.GetModelViewMatrix();
-	glm::mat4 projection = m_instanceOGL.GetProjectionMatrix();
-	
-	for (int y = start.y; y <= end.y; y++)
-	{
-		for (int x = start.x; x <= end.x; x++)
-		{
-			currentPoint.x = x; currentPoint.y = y; currentPoint.z = pDepth[x*height + y];
-			objcoord = glm::unProject(currentPoint, modelview, projection, viewport);
-			TRACE("%f %f %f\n", objcoord.x, objcoord.y, objcoord.z);
-		}
-	}
-	
-}
+//void COpenGLDoc::UnProjection(CPoint point, int width, int height)
+//{
+//	GLint view[16];
+//	glm::ivec2 start(point.x, point.y);
+//	glm::ivec2 end(point.x + width, point.y + height);
+//	glm::vec3 currentPoint(0);
+//	glm::vec3 objcoord(0);
+//	float* pDepth = new float[width*height];
+//	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+//	glReadPixels(start.x, start.y, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, &pDepth);
+//	checkError("Readpixel");
+//	//glm::vec3 onTheScreen(point.x, point.y, 0.0f);
+//	glm::vec4 viewport = glm::vec4(0.0f, 0.0f, m_windowSize.x, m_windowSize.y);
+//	glm::mat4 modelview = m_instanceOGL.GetModelViewMatrix();
+//	glm::mat4 projection = m_instanceOGL.GetProjectionMatrix();
+//	
+//	for (int y = start.y; y <= end.y; y++)
+//	{
+//		for (int x = start.x; x <= end.x; x++)
+//		{
+//			currentPoint.x = x; currentPoint.y = y; currentPoint.z = pDepth[x*height + y];
+//			objcoord = glm::unProject(currentPoint, modelview, projection, viewport);
+//			TRACE("%f %f %f\n", objcoord.x, objcoord.y, objcoord.z);
+//		}
+//	}
+//}
 
 // COpenGLDoc serialization
 

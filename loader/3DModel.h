@@ -19,6 +19,8 @@
 #ifdef _WIN32
 	#pragma comment (lib,"lib/assimp.lib")
 #endif
+#include "../glm/gtc/type_ptr.hpp"
+#include "../glm/gtc/matrix_transform.hpp"
 
 struct Vertex
 {
@@ -44,11 +46,10 @@ struct Material
 		float fShininess;
 };
 
-
 ///
 /// Class C3DModel.
 ///
-/// A class for loading and displaying and object using Open Asset Import Librery
+/// A class for loading and displaying and object using Open Asset Import Librery. Always is assume that model HAS TEXTURE
 ///
 ///
 class C3DModel
@@ -59,24 +60,21 @@ private:
 	std::vector<Mesh> m_vMesh;
 	std::vector<CTexture> m_vTexture;
 	std::vector<unsigned int> m_vTextureMatIndex;
-	//unsigned int m_uVBO;
-	//unsigned int m_uVBOIndex;
-	//unsigned int m_uVBOColor;
 	int m_iNPoints;
-	GLuint m_uVAO;		//for the model
-	GLuint m_uVAOVertex;	//for the vertexes
 	unsigned int m_iIndexSize;
-	bool m_bHasTextures;
+
+	//his own modelmatrix
+	glm::mat4 m_mModelMatrix;
 
 	//also added before
 	std::vector<glm::vec3> m_Vertex;
+	//std::vector<glm::vec3> m_PointsTriangle;	//this structure repeat the vertexes to use the DrawArray
 	std::vector<glm::vec2> m_TexCood;
 	std::vector<unsigned int> vIndex;
-	std::vector<Vertex> vVertex;
-
+	std::vector<Vertex> vVertex;	//the complete structure, only to read
+	GLuint m_iDisplayList;
 
 	/// Recursive to explore all the elements
-	//void fillNode(const struct aiNode* pNode, glm::mat4 mMatrix);
 	void fillNode(const aiScene* scene, const struct aiNode* pNode, const glm::mat4 & mMatrix, int & iOffset, std::vector<Vertex> & vVertex, std::vector<unsigned int> & vIndex);
 
 	///Method applies the materials to an object given a mtl
@@ -89,9 +87,6 @@ public:
 	C3DModel();
 	~C3DModel();
 
-	///Return of have texture
-	inline bool hasTexture(){return m_bHasTextures;}
-
 	///Method to load an object
 	bool load(const std::string & sFilename, glm::vec3 pCenterOn = glm::vec3(0));
 
@@ -99,15 +94,21 @@ public:
 	void drawObject();
 
 	///Draw points using the VBO
-	void drawPoints();
+	void drawPoints(const std::vector<bool> & vbSelected);
 
 	///Get the center of the object
 	inline glm::vec3 getCenter(){return m_bbox.getCenter();}
 
+	///Get the number of vertexes
+	inline int GetNVertex(){ return vVertex.size(); }
+
 	///Get the lenght of the diagonal of bounding box
 	inline float getDiagonal(){return m_bbox.getDiagonal();}
 
-	//void centerOnPoint(glm::vec3 p);
-	void deleteBuffers();
+	///Get the model matrix of the model
+	inline const glm::mat4 & getModelMatrix(){ return m_mModelMatrix; }
+
+	///Get the array of vertex read-only
+	inline const std::vector<glm::vec3> & getVertexData(){ return m_Vertex; }
 };
 #endif
