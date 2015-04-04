@@ -99,7 +99,7 @@ void CGLRenderer::Reshape(CDC* pDC, int w, int h)
 	float ratio = w / float(h);
 	glViewport(0, 0, w, h);
 	
-	m_projMatrix = glm::perspective(COGLBasic::getInstance().fAngle, ratio, COGLBasic::getInstance().fNCP, COGLBasic::getInstance().fFCP);
+	m_projMatrix = glm::perspective(COGLBasic::getInstance()->fAngle, ratio, COGLBasic::getInstance()->fNCP, COGLBasic::getInstance()->fFCP);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glMultMatrixf(glm::value_ptr(m_projMatrix));
@@ -139,8 +139,14 @@ void CGLRenderer::CreateBox(int x0, int y0, int x1, int y1)
 void CGLRenderer::MoveBoxXY(int x, int y)
 {
 	CMatrix4x4f projection;
-	projection.SetMatrix(glm::value_ptr(m_projMatrix));
+	projection.SetMatrix(glm::value_ptr(m_projMatrix)); 
+	projection.Transpose();
 	m_box.MoveXY(x, y, m_iWidth, m_iHeight, projection);
+}
+
+void CGLRenderer::MoveBoxZ(float fDelta)
+{
+	m_box.MoveZ((int)fDelta);
 }
 
 void CGLRenderer::SelectBox()
@@ -168,35 +174,6 @@ void CGLRenderer::DrawBox()
 {
 	m_box.Draw();
 }
-//void CGLRenderer::Select(int x0, int y0, int x1, int y1)
-//{
-//	if (x1<x0) std::swap(x0, x1);
-//	if (y1<y0) std::swap(y0, y1);
-//	glm::mat4 viewport;
-//	viewport = glm::scale(glm::mat4(1), glm::vec3(m_iWidth, m_iHeight, 1.0f));
-//	viewport = glm::scale(viewport, glm::vec3(1.0f / 2.0f, 1.0f / 2.0f, 1.0f)));
-//	viewport = glm::translate(viewport, glm::vec3(1.0f, 1.0f, 0.0f));
-//
-//	glm::mat4 mvp = m_projMatrix * modelView;
-//	for (int i = 0; i<points.size(); i++)
-//	{
-//		CVector4Df r = mvp * points[i];
-//		r.Normalize(); // esto es, dividir entre w, y dejar w en 1
-//		if (-1.0f <= r[0] && r[0] <= 1.0f && -1.0f <= r[1] && r[1] <= 1.0f && -1.0f <= r[2] && r[2] <= 1.0f) // inside the frustum
-//		{
-//			// inside the square?
-//			r = viewport * r;
-//			r.Normalize(); // esto es, dividir entre w, y dejar w en 1
-//			glm::normalize(glm::vec3(0));
-//			if (x0 <= r[0] && r[0] <= x1 && y0 <= r[1] && r[1] <= y1)
-//				selected[i] = true;
-//			else
-//				selected[i] = false;
-//		}
-//		else
-//			selected[i] = false;
-//	}
-//}
 
 void CGLRenderer::DrawGradientBackground()
 {
@@ -236,48 +213,6 @@ void CGLRenderer::DrawNormalBackground()
 	glLoadIdentity();
 }
 
-const float DEG2RAD = 3.14159f / 180.f;
-void CGLRenderer::DrawIndicator()
-{
-	glPushMatrix();
-	glLoadIdentity();
-	glMultMatrixf(glm::value_ptr(m_mViewMatrix));
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	float ratio = (float)m_iWidth / (float)m_iHeight;
-	gluPerspective(90.0, ratio, 0.001, 100);
-	float radius = 0.2f;
-	glBegin(GL_LINE_LOOP);
-	glColor3ub(225, 155, 155);
-	for (int i = 0; i < 360; i++)
-	{
-		float degInRad = i*DEG2RAD;
-		glVertex3f(cos(degInRad)*radius, sin(degInRad)*radius, 0);
-	}
-	glEnd();
-
-	glBegin(GL_LINE_LOOP);
-	glColor3ub(155, 225, 155);
-	for (int i = 0; i < 360; i++)
-	{
-		float degInRad = i*DEG2RAD;
-		glVertex3f(0, cos(degInRad)*radius, sin(degInRad)*radius);
-	}
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-	glColor3ub(155, 155, 225);
-	for (int i = 0; i < 360; i++)
-	{
-		float degInRad = i*DEG2RAD;
-		glVertex3f(cos(degInRad)*radius, 0, sin(degInRad)*radius);
-	}
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-}
-
 void CGLRenderer::DrawScene(CDC* pDC)
 {
 	wglMakeCurrent(pDC->m_hDC, m_hrc);
@@ -286,7 +221,6 @@ void CGLRenderer::DrawScene(CDC* pDC)
 	m_mViewMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -0.5)) * m_arcBall.GetTransformation();
 	m_modelViewMatrix = m_mViewMatrix * m_model.getModelMatrix();
 	glMultMatrixf(glm::value_ptr(m_modelViewMatrix));
-	//DrawIndicator();	//it does not works for now
 	m_model.drawObject();
 	m_model.drawPoints(m_vSelected);
 }

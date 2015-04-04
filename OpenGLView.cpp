@@ -81,10 +81,20 @@ void COpenGLView::OnDraw(CDC* pDC)
 		if (m_bIsLeftMouse)
 		{
 			if (!m_bIsBoxCreated)
+			{
 				pDoc->m_instanceOGL.CreateBox(m_startPoint.x, m_startPoint.y, m_endPoint.x, m_endPoint.y);
+			}
 			else
 			{
 				pDoc->m_instanceOGL.MoveBoxXY(createdPoint.x, createdPoint.y);
+				pDoc->m_instanceOGL.SelectBox();
+			}
+		}
+		else if (m_bIsRightMouse)
+		{
+			if (m_bIsBoxCreated)
+			{
+				pDoc->m_instanceOGL.MoveBoxZ(m_fDelta);
 				pDoc->m_instanceOGL.SelectBox();
 			}
 		}
@@ -196,6 +206,12 @@ void COpenGLView::OnLButtonDown(UINT nFlags, CPoint point)
 			m_startPoint.x = point.x;
 			m_startPoint.y = rect.bottom - point.y;
 			m_endPoint = m_startPoint;
+			if (m_bIsBoxCreated)
+			{
+				createdPoint.x = point.x;
+				createdPoint.y = rect.bottom - point.y;
+				Invalidate(false);
+			}
 		}
 		else
 		{
@@ -211,17 +227,23 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	if (m_bIsSelection)
 	{
-
 		RECT rect;
 		GetClientRect(&rect);
-		m_endPoint.x = point.x;
-		m_endPoint.y = rect.bottom - point.y;
-		if (m_bIsBoxCreated)
+		if (m_bIsLeftMouse)
 		{
-			createdPoint.x = point.x;
-			createdPoint.y = rect.bottom - point.y;
+			m_endPoint.x = point.x;
+			m_endPoint.y = rect.bottom - point.y;
+			if (m_bIsBoxCreated)
+			{
+				createdPoint.x = point.x;
+				createdPoint.y = rect.bottom - point.y;
+			}
 		}
-		Invalidate(false);
+		else if (m_bIsRightMouse)
+		{
+			m_fDelta = point.y - createdPoint.y;
+			createdPoint.y = point.y;
+		}
 	}
 	else
 	{
@@ -261,7 +283,9 @@ void COpenGLView::OnRButtonDown(UINT nFlags, CPoint point)
 		m_bIsRightMouse = true;
 		if (m_bIsSelection)
 		{
-		
+			createdPoint.y = point.y;
+			m_fDelta = 0;
+			Invalidate(false);
 		}
 		else
 			GetDocument()->m_instanceOGL.MouseDown(point.x, point.y);

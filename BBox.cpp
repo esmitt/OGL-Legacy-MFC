@@ -209,26 +209,32 @@ void CBBox::MoveZ(int mouseDisplacementInY)
 
 void CBBox::MoveXY(int currX, int currY, int g_width, int g_height, CMatrix4x4f &projection)
 {
-  CMatrix4x4f invProjection(projection);
-  if (invProjection.Invert() == false)
-    return;
-  CVector4Df center = CVector4Df(0.5f, 0.5f, 0.5f, 1.0f);
-  center = (projection * m_model) * center;
-  center.Normalize();
-  // now, we have the center´s box in clipping space
+	CMatrix4x4f invProjection(projection);
+	if (invProjection.Invert() == false)
+		return;
+	CVector4Df center = CVector4Df(0.5f, 0.5f, 0.5f, 1.0f);
+	center = (projection * m_model) * center;
+	center.Normalize();
+	// now, we have the center´s box in clipping space
 
-  CMatrix4x4f invViewport;
-  invViewport.Translate(-1.0f, -1.0f, -1.0f);
-  invViewport.Scale(2.0f/g_width, 2.0f/g_height, 1.0f);
+	CMatrix4x4f invViewport;
+	invViewport.Translate(-1.0f, -1.0f, -1.0f);
+	invViewport.Scale(2.0f / g_width, 2.0f / g_height, 1.0f);
 
 	CVector4Df mouseClip = invViewport * CVector4Df((float)currX, (float)currY, 0.0f, 1.0f);
-  // now, we have the mouse and the box center in clipping space
+	// now, we have the mouse and the box center in clipping space
 
-  CVector4Df translation = mouseClip - center;
+	//CVector4Df translation = mouseClip - center;
 
-  // traslation vector in eye space
-  translation = invProjection * translation;
+	// traslation vector in eye space
+	//translation = invProjection * translation;
 
-  m_translate = m_translate + translation;
-  BuildModel();
+	//m_translate = m_translate + translation;
+	//float oldZ = m_translate[2];
+	mouseClip[2] = center[2];
+	mouseClip.Normalize();
+	m_translate = invProjection * mouseClip;
+	m_translate.Normalize();
+	//m_translate[2] = oldZ;
+	BuildModel();
 }

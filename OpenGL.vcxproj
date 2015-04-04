@@ -131,6 +131,7 @@
     <ClCompile Include="loader\Texture.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Matrix4x4f.cpp" />
+    <ClCompile Include="OGLBasic.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="OpenGLDoc.cpp" />
     <ClCompile Include="OpenGLView.cpp" />

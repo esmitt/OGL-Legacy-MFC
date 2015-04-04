@@ -37,6 +37,7 @@ private:
 	bool m_bIsBoxCreated;
 	CPoint m_startPoint;		//to click the left button
 	CPoint m_endPoint;			//to dragging/finish the mouse clicking
+	float m_fDelta;
 protected:
 	bool m_bIsLeftMouse;
 	bool m_bIsRightMouse;

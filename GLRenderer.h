@@ -26,6 +26,7 @@ public:
 	//about the box selection
 	void CreateBox(int x0, int y0, int x1, int y1);
 	void MoveBoxXY(int x, int y);
+	void MoveBoxZ(float fDelta);
 	void DrawBox();
 	void Clear();
 	void SelectBox();

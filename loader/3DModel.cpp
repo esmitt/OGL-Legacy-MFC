@@ -146,13 +146,13 @@ void C3DModel::fillNode(const aiScene* scene, const struct aiNode* pNode, const 
 		for(i = 0; i < mesh->mNumVertices; ++i)
 		{
 			Vertex v;
-			if(mesh->HasTextureCoords(0))	//check
+			if(mesh->HasTextureCoords(0))
 				v.tTextureCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 			else v.tTextureCoord = glm::vec2(0,0);
 			v.vNormalCoord = glm::vec3(mesh->mNormals[i].x,mesh->mNormals[i].y,mesh->mNormals[i].z);
 			v.pWorldCoord = mModelMatrix*glm::vec4(mesh->mVertices[i].x,mesh->mVertices[i].y,mesh->mVertices[i].z,1.0f);
 			
-			m_bbox.addPoint(glm::vec3(v.pWorldCoord));	//CHECK
+			m_bbox.addPoint(glm::vec3(v.pWorldCoord));
 			v.vColorDiffuse = glm::vec4(1,0,0,1);
 			if(aiGetMaterialColor(scene->mMaterials[mesh->mMaterialIndex], AI_MATKEY_COLOR_DIFFUSE, &color) == AI_SUCCESS){
 				v.vColorDiffuse = glm::vec4(color.r, color.g, color.b, color.a);
